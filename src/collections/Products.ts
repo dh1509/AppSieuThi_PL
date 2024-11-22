@@ -63,24 +63,54 @@ export const Products: CollectionConfig = {
       required: false, 
     },
     {
-      name: 'attributes', // Liên kết các thuộc tính
+      name: 'attributes', // Liên kết các thuộc tính (ví dụ: size, color)
       type: 'array',
       fields: [
         {
-          name: 'attribute', // Thuộc tính (e.g., Size, Color)
+          name: 'attribute', // Thuộc tính (size, color)
           type: 'relationship',
-          relationTo: 'product-attributes',
+          relationTo: 'product-attributes', // Liên kết với bảng product-attributes
           required: true,
         },
         {
-          name: 'values', // Giá trị thuộc tính (đa chọn)
+          name: 'values', // Giá trị của thuộc tính (size cụ thể)
           type: 'relationship',
-          relationTo: 'attribute-values',
+          relationTo: 'attribute-values', // Liên kết với bảng attribute-values
           required: true,
-          hasMany: true,
-          admin: {
-            condition: (_, siblingData) => !!siblingData.attribute, // Chỉ hiển thị khi `attribute` đã được chọn
+          hasMany: true, // Cho phép chọn nhiều giá trị
+          filterOptions: ({ siblingData }: { siblingData: any }) => {
+            if (siblingData.attribute) {
+              const attributeId = siblingData.attribute;
+              return {
+                attribute: {
+                  equals: attributeId, // Lọc các giá trị của thuộc tính đã chọn
+                },
+              };
+            }
+            return {}; // Trả về một đối tượng trống nếu chưa có thuộc tính nào được chọn
           },
+        },
+      ],
+    },
+  ],
+};
+
+
+// {
+        //   name: 'attribute', // Thuộc tính (e.g., Size, Color)
+        //   type: 'relationship',
+        //   relationTo: 'product-attributes',
+        //   required: true,
+        // },
+        // {
+        //   name: 'values', // Giá trị thuộc tính (đa chọn)
+        //   type: 'relationship',
+        //   relationTo: 'attribute-values',
+        //   required: true,
+        //   hasMany: true,
+        //   admin: {
+        //     condition: (_, siblingData) => !!siblingData.attribute, // Chỉ hiển thị khi `attribute` đã được chọn
+        //   },
         //   hooks: {
         //     beforeChange: [
         //       async ({ value, siblingData, req }) => {
@@ -120,8 +150,4 @@ export const Products: CollectionConfig = {
         //       },
         //     ],            
         //   },
-        },
-      ],
-    },
-  ],
-};
+        // },
