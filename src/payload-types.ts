@@ -8,21 +8,92 @@
 
 export interface Config {
   auth: {
+    accounts: AccountAuthOperations;
     users: UserAuthOperations;
   };
   collections: {
+    accounts: Account;
     users: User;
-    media: Media;
+    customers: Customer;
+    permissions: Permission;
+    'points-history': PointsHistory;
+    branches: Branch;
+    categories: Category;
+    products: Product;
+    promotions: Promotion;
+    product_promotions: ProductPromotion;
+    orders: Order;
+    order_items: OrderItem;
+    order_shippings: OrderShipping;
+    points_conversion_rate: PointsConversionRate;
+    complaints: Complaint;
+    sales_reports: SalesReport;
+    'product-attributes': ProductAttribute;
+    'attribute-values': AttributeValue;
+    'product-prices': ProductPrice;
+    'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
+  };
+  collectionsJoins: {};
+  collectionsSelect: {
+    accounts: AccountsSelect<false> | AccountsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    permissions: PermissionsSelect<false> | PermissionsSelect<true>;
+    'points-history': PointsHistorySelect<false> | PointsHistorySelect<true>;
+    branches: BranchesSelect<false> | BranchesSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    promotions: PromotionsSelect<false> | PromotionsSelect<true>;
+    product_promotions: ProductPromotionsSelect<false> | ProductPromotionsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    order_items: OrderItemsSelect<false> | OrderItemsSelect<true>;
+    order_shippings: OrderShippingsSelect<false> | OrderShippingsSelect<true>;
+    points_conversion_rate: PointsConversionRateSelect<false> | PointsConversionRateSelect<true>;
+    complaints: ComplaintsSelect<false> | ComplaintsSelect<true>;
+    sales_reports: SalesReportsSelect<false> | SalesReportsSelect<true>;
+    'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
+    'attribute-values': AttributeValuesSelect<false> | AttributeValuesSelect<true>;
+    'product-prices': ProductPricesSelect<false> | ProductPricesSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: string;
   };
   globals: {};
+  globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'users';
+  user:
+    | (Account & {
+        collection: 'accounts';
+      })
+    | (User & {
+        collection: 'users';
+      });
+  jobs: {
+    tasks: unknown;
+    workflows: unknown;
+  };
+}
+export interface AccountAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
   };
 }
 export interface UserAuthOperations {
@@ -45,9 +116,9 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "accounts".
  */
-export interface User {
+export interface Account {
   id: string;
   updatedAt: string;
   createdAt: string;
@@ -62,22 +133,357 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "users".
  */
-export interface Media {
+export interface User {
   id: string;
-  alt: string;
+  username: string;
+  phone: number;
+  address: string;
+  role: 'admin' | 'manager' | 'staff' | 'customer';
+  is_active?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers".
+ */
+export interface Customer {
+  id: string;
+  full_name: string;
+  dob: string;
+  phone: number;
+  address: string;
+  points: number;
+  user: string | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions".
+ */
+export interface Permission {
+  id: string;
+  user: string | User;
+  role: 'admin' | 'manager' | 'staff' | 'customer';
+  module: string;
+  actions:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "points-history".
+ */
+export interface PointsHistory {
+  id: string;
+  customer: string | Customer;
+  points: number;
+  reason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches".
+ */
+export interface Branch {
+  id: string;
+  name: string;
+  address: string;
+  phone: number;
+  manager?: (string | null) | User;
+  total_products?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  points_price: number;
+  quantity?: number | null;
+  image_url?: string | null;
+  description?: string | null;
+  category?: (string | null) | Category;
+  branch?: (string | null) | Branch;
+  attributes?:
+    | {
+        attribute: string | ProductAttribute;
+        values?: (string | AttributeValue)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-attributes".
+ */
+export interface ProductAttribute {
+  id: string;
+  category: string | Category;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attribute-values".
+ */
+export interface AttributeValue {
+  id: string;
+  product: string | Product;
+  attribute: string | ProductAttribute;
+  value: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions".
+ */
+export interface Promotion {
+  id: string;
+  name: string;
+  description?: string | null;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  start_date?: string | null;
+  end_date?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_promotions".
+ */
+export interface ProductPromotion {
+  id: string;
+  product: string | Product;
+  promotion: string | Promotion;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  customer: string | Customer;
+  status: 'pending' | 'in_progress' | 'completed';
+  total_price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order_items".
+ */
+export interface OrderItem {
+  id: string;
+  order: string | Order;
+  product: string | Product;
+  quantity: number;
+  price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order_shippings".
+ */
+export interface OrderShipping {
+  id: string;
+  order: string | Order;
+  shipping_address: string;
+  shipping_fee: number;
+  shipping_status: 'pending' | 'shipped' | 'delivered';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "points_conversion_rate".
+ */
+export interface PointsConversionRate {
+  id: string;
+  conversion_rate: number;
+  updated_by?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "complaints".
+ */
+export interface Complaint {
+  id: string;
+  customer: string | Customer;
+  complaint_type: 'order_issue' | 'product_quality' | 'service_quality';
+  complaint_details: string;
+  status?: ('pending' | 'resolved' | 'closed') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sales_reports".
+ */
+export interface SalesReport {
+  id: string;
+  report_type: 'daily' | 'weekly' | 'monthly';
+  total_revenue: number;
+  total_points: number;
+  total_customers: number;
+  order_id?: (string | null) | Order;
+  customer_id?: (string | null) | Customer;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-prices".
+ */
+export interface ProductPrice {
+  id: string;
+  product: string | Product;
+  setPriceForAllSizes: 'all_sizes' | 'individual_sizes';
+  price: number;
+  attribute_value?: (string | null) | AttributeValue;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents".
+ */
+export interface PayloadLockedDocument {
+  id: string;
+  document?:
+    | ({
+        relationTo: 'accounts';
+        value: string | Account;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'customers';
+        value: string | Customer;
+      } | null)
+    | ({
+        relationTo: 'permissions';
+        value: string | Permission;
+      } | null)
+    | ({
+        relationTo: 'points-history';
+        value: string | PointsHistory;
+      } | null)
+    | ({
+        relationTo: 'branches';
+        value: string | Branch;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'promotions';
+        value: string | Promotion;
+      } | null)
+    | ({
+        relationTo: 'product_promotions';
+        value: string | ProductPromotion;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'order_items';
+        value: string | OrderItem;
+      } | null)
+    | ({
+        relationTo: 'order_shippings';
+        value: string | OrderShipping;
+      } | null)
+    | ({
+        relationTo: 'points_conversion_rate';
+        value: string | PointsConversionRate;
+      } | null)
+    | ({
+        relationTo: 'complaints';
+        value: string | Complaint;
+      } | null)
+    | ({
+        relationTo: 'sales_reports';
+        value: string | SalesReport;
+      } | null)
+    | ({
+        relationTo: 'product-attributes';
+        value: string | ProductAttribute;
+      } | null)
+    | ({
+        relationTo: 'attribute-values';
+        value: string | AttributeValue;
+      } | null)
+    | ({
+        relationTo: 'product-prices';
+        value: string | ProductPrice;
+      } | null);
+  globalSlug?: string | null;
+  user:
+    | {
+        relationTo: 'accounts';
+        value: string | Account;
+      }
+    | {
+        relationTo: 'users';
+        value: string | User;
+      };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -85,10 +491,15 @@ export interface Media {
  */
 export interface PayloadPreference {
   id: string;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'accounts';
+        value: string | Account;
+      }
+    | {
+        relationTo: 'users';
+        value: string | User;
+      };
   key?: string | null;
   value?:
     | {
@@ -112,6 +523,284 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accounts_select".
+ */
+export interface AccountsSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  username?: T;
+  phone?: T;
+  address?: T;
+  role?: T;
+  is_active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  full_name?: T;
+  dob?: T;
+  phone?: T;
+  address?: T;
+  points?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions_select".
+ */
+export interface PermissionsSelect<T extends boolean = true> {
+  user?: T;
+  role?: T;
+  module?: T;
+  actions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "points-history_select".
+ */
+export interface PointsHistorySelect<T extends boolean = true> {
+  customer?: T;
+  points?: T;
+  reason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches_select".
+ */
+export interface BranchesSelect<T extends boolean = true> {
+  name?: T;
+  address?: T;
+  phone?: T;
+  manager?: T;
+  total_products?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  price?: T;
+  points_price?: T;
+  quantity?: T;
+  image_url?: T;
+  description?: T;
+  category?: T;
+  branch?: T;
+  attributes?:
+    | T
+    | {
+        attribute?: T;
+        values?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions_select".
+ */
+export interface PromotionsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  discount_type?: T;
+  discount_value?: T;
+  start_date?: T;
+  end_date?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_promotions_select".
+ */
+export interface ProductPromotionsSelect<T extends boolean = true> {
+  product?: T;
+  promotion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  customer?: T;
+  status?: T;
+  total_price?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order_items_select".
+ */
+export interface OrderItemsSelect<T extends boolean = true> {
+  order?: T;
+  product?: T;
+  quantity?: T;
+  price?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order_shippings_select".
+ */
+export interface OrderShippingsSelect<T extends boolean = true> {
+  order?: T;
+  shipping_address?: T;
+  shipping_fee?: T;
+  shipping_status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "points_conversion_rate_select".
+ */
+export interface PointsConversionRateSelect<T extends boolean = true> {
+  conversion_rate?: T;
+  updated_by?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "complaints_select".
+ */
+export interface ComplaintsSelect<T extends boolean = true> {
+  customer?: T;
+  complaint_type?: T;
+  complaint_details?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sales_reports_select".
+ */
+export interface SalesReportsSelect<T extends boolean = true> {
+  report_type?: T;
+  total_revenue?: T;
+  total_points?: T;
+  total_customers?: T;
+  order_id?: T;
+  customer_id?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-attributes_select".
+ */
+export interface ProductAttributesSelect<T extends boolean = true> {
+  category?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attribute-values_select".
+ */
+export interface AttributeValuesSelect<T extends boolean = true> {
+  product?: T;
+  attribute?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-prices_select".
+ */
+export interface ProductPricesSelect<T extends boolean = true> {
+  product?: T;
+  setPriceForAllSizes?: T;
+  price?: T;
+  attribute_value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents_select".
+ */
+export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences_select".
+ */
+export interface PayloadPreferencesSelect<T extends boolean = true> {
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations_select".
+ */
+export interface PayloadMigrationsSelect<T extends boolean = true> {
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
